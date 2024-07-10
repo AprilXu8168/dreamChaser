@@ -1,2 +1,2 @@
 # dreamChaser
-Front of my app
+Frontend of my app
