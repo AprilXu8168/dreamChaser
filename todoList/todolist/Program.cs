@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using todolist.Data;
+using Microsoft.Extensions.DependencyInjection;
+using MvcTasks.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<MvcTasksContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("MvcTasksContext") ?? throw new InvalidOperationException("Connection string 'MvcTasksContext' not found.")));
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -37,7 +41,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=TodoList}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

@@ -6,7 +6,7 @@ namespace todolist.Models
     {
         public int Id { get; set; }
         
-        public string TaskContents { get; set; }
+        public string? TaskContent { get; set; }
 
         public bool TaskDone { get; set; }
 
