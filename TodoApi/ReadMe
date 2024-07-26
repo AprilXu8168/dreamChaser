@@ -1,0 +1,96 @@
+
+
+### Dotnet.Core.api
+
+[Resource](https://learn.microsoft.com/en-au/aspnet/core/tutorials/first-web-api?view=aspnetcore-8.0&tabs=visual-studio)
+
+
+### Main job of an api app
+| API                        | Description                    | Request Body   | Response Body          |
+|----------------------------|--------------------------------|----------------|------------------------|
+| GET /api/todoitems          | Get all to-do items            | None           | Array of to-do items   |
+| GET /api/todoitems/{id}     | Get an item by ID              | None           | To-do item             |
+| POST /api/todoitems         | Add a new item                 | To-do item     | To-do item             |
+| PUT /api/todoitems/{id}     | Update an existing item        | To-do item     | None                   |
+| DELETE /api/todoitems/{id}  | Delete an item                 | None           | None  
+
+
+0. generate code
+```
+    dotnet new webapi --use-controllers -o TodoApi
+    cd TodoApi
+    dotnet add package Microsoft.EntityFrameworkCore.InMemory
+    code -r ../TodoApi
+```
+
+1. start from model folder, define data that app manages
+
+2. add a database context,  as the main class that coordinates EF functionality  for a data model
+```
+    using Microsoft.EntityFrameworkCore;
+
+    namespace TodoApi.Models;
+
+    public class TodoContext : DbContext
+    {
+        public TodoContext(DbContextOptions<TodoContext> options)
+            : base(options)
+        {
+        }
+        public DbSet<TodoItem> TodoItems { get; set; } = null!;
+    }
+
+    // TodoItem is the basic data type defined in model earlier
+```
+
+3. Register db context
+```
+ => Program.cs
+
+    using Microsoft.EntityFrameworkCore;
+    using TodoApi.Models;
+    
+    ...
+
+    builder.Services.AddDbContext<TodoContext>(opt =>
+        opt.UseInMemoryDatabase("TodoList"));
+```
+
+4. Scaffold a controller
+```
+    => TodoApi Root of project
+
+    dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
+    dotnet add package Microsoft.EntityFrameworkCore.Design
+    dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+    dotnet add package Microsoft.EntityFrameworkCore.Tools
+    dotnet tool uninstall -g dotnet-aspnet-codegenerator
+    dotnet tool install -g dotnet-aspnet-codegenerator
+    dotnet tool update -g dotnet-aspnet-codegenerator
+```
+
+5. Generate Controller based on models and dbcontext
+```
+    dotnet aspnet-codegenerator controller -name TodoItemsController -async -api -m TodoItem -dc TodoContext -outDir Controllers
+
+```
+
+6. Review code to check routing 
+
+```
+    dotnet run dev
+```
+
+NOTE: Make sure to check port number before click 
+
+[API PAGE](http://localhost:5295/swagger/index.html)
+
+[single data review](http://localhost:5295/api/TodoItems/2)
+
+7. Interaction with JS page
+```
+    => wwwroot -> index.html
+    => wwwroot -> js -> site.js
+    => wwwroot -> css -> site.css
+```
+[Index page review](http://localhost:5295)

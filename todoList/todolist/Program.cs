@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using todolist.Data;
+using todolist.Models;
 using Microsoft.Extensions.DependencyInjection;
 using MvcTasks.Data;
 
@@ -17,7 +18,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddDbContext<TodoContext>(opt=>opt.UseMemoryDatabase("TodoList"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
