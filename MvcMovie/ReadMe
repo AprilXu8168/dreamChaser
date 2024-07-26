@@ -1,0 +1,18 @@
+### Dotnet core MVC 
+
+
+[toturial p1](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-8.0&tabs=visual-studio-code)
+
+0. Create mvc app with command
+```
+    dotnet new mvc -o MvcMovie
+```
+
+1. Run and check start up 
+```
+    dotnet run dev
+```
+
+[tutorial p2](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-controller?view=aspnetcore-8.0&tabs=visual-studio)
+
+2. 
