@@ -377,3 +377,67 @@ Change model to model.Movies as the input model type has been modified
     <tbody>
         @foreach (var item in Model.Movies!)
 ```
+model => Model.Movie[0]!.Title
+```
+This lambda expression is used to specify which property’s display name should be retrieved.
+```
+
+[tutorial p7 add a new field](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/new-field?view=aspnetcore-8.0&tabs=visual-studio-code)
+
+- Update models to add a new field 
+- comand ```dotnet build```
+- add new field to bind  -> Controllers/MovieController/cs
+- add new field to -> views/Movies/Index.cshtml
+- add new field to ->Views/MovieS/Create.cshtml
+- Add new field to seedData or init table, etc
+> **_NOTE:_**  This app will not run until db updated
+
+- Delete everything in /Migrations
+``` sudo rm -rv Migrations/```
+
+- Remove db 
+``` sudo rm -r MvcMovieContext-*
+
+- add another initial migrations
+``` dotnet ef migrations add InitialCreate```
+
+- updatedb context
+``` dotnet ef database update```
+
+[tutorial p8 add a Validator](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/validation?view=aspnetcore-8.0e)
+
+-> Models/Movie.cs
+```
+e.g. Update [Required, StringLength, RegularExpression, Range and DataType, etc.]
+    [StringLength(60, MinimumLength = 3)]
+    [Required]
+    public string? Title { get; set; }
+
+    [Display(Name = "Release Date")]
+    [DataType(DataType.Date)]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+
+    public DateTime ReleaseDate { get; set; }
+
+    [Range(1, 100)]
+    [DataType(DataType.Currency)]
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal Price { get; set; }    
+
+    [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$")] 
+    // Must only use letters.
+    // first letter is required to be uppercase.
+    [Required]
+    [StringLength(30)]
+    public string? Genre { get; set; }
+
+    [RegularExpression(@"^[A-Z]+[a-zA-Z0-9""'\s-]*$")]
+    [StringLength(5)]
+    [Required]
+    public string? Rating { get; set; }
+```
+
+- DataType attributes only provide hints for the view engine to format the data and supplies elements/attributes  -> DataAnnotations 
+
+- displayFormat and ```ApplyFormatInEditMode``` setting specifies that the formatting should also be applied when the value is displayed in a text box for editing
+
