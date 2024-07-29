@@ -1,18 +1,210 @@
-### Dotnet core MVC 
+## Dotnet core MVC 
 
 
-[toturial p1](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-8.0&tabs=visual-studio-code)
+[toturial p1 MVC Start](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-8.0&tabs=visual-studio-code)
 
-0. Create mvc app with command
+### 0.  Create mvc app with command
 ```
-    dotnet new mvc -o MvcMovie
-```
-
-1. Run and check start up 
-```
-    dotnet run dev
+dotnet new mvc -o MvcMovie
 ```
 
-[tutorial p2](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-controller?view=aspnetcore-8.0&tabs=visual-studio)
+### 1. Run and check start up 
+```
+dotnet run dev
+```
 
-2. 
+[tutorial p2 add Controller to MVC](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-controller?view=aspnetcore-8.0&tabs=visual-studio)
+
+| Component | Description                                                | Responsibilities                                    |
+|-----------|------------------------------------------------------------|----------------------------------------------------|
+| Model     | Represents the data and the business logic of the application. | - Manages data and business rules.<br>- Retrieves data from databases.<br>- Updates data based on user actions. |
+| View      | Represents the presentation layer and user interface.     | - Displays data to the user.<br>- Renders the user interface.<br>- Sends user input to the controller. |
+| Controller| Acts as an intermediary between the Model and the View.    | - Handles user input.<br>- Updates the model based on user actions.<br>- Refreshes the view based on model changes. |
+
+### 2. Modify Controller 
+```
+Default URL routing logic 
+/[Controller]/[ActionName]/[Parameters]
+find in /Programe.cs
+```
+
+UseCase Example
+```
+-> Controllers/HelloWorldController.cs
+
+// GET: /HelloWorld/Welcome/ 
+// Requires using System.Text.Encodings.Web;
+public string Welcome(string name, int numTimes = 1)
+{
+    return HtmlEncoder.Default.Encode($"Hello {name}, NumTimes is: {numTimes}");
+}
+```
+
+To visit the output: https://localhost:{PORT}/HelloWorld/Welcome?name=Rick&numtimes=4
+
+- The & character separates field-value pairs.
+
+- The ? (question mark) in the above URL is a separator, and the query string follows.
+
+[tutorial p3 add View to MVC](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-view?view=aspnetcore-8.0&tabs=visual-studio)
+
+### 3. Work with new views
+
+.cshtml file extension => Razor-based view templates
+
+Modify layout inside ```Views/Shared/_Layout.cshtml ```
+
+Modify displays from views:
+```
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<h2>Welcome</h2>
+
+<ul>
+    @for (int i = 0; i < (int)ViewData["NumTimes"]!; i++)
+    {
+        <li>@ViewData["Message"]</li>
+    }
+</ul>
+```
+To visit the output: https://localhost:{PORT}/HelloWorld/Welcome?name=Rick&numtimes=4
+
+[tutorial p4 add Model To MVC](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/adding-model?view=aspnetcore-8.0&tabs=visual-studio)
+
+### 4. Add data model class
+```
+-> Models/Movie.cs
+using System.ComponentModel.DataAnnotations;
+
+namespace MvcMovie.Models;
+
+public class Movie
+{
+    public int Id { get; set; }
+    public string? Title { get; set; }
+    ...
+}
+```
+
+### 5. Add NuGet Packages
+```
+dotnet tool uninstall --global dotnet-aspnet-codegenerator
+dotnet tool install --global dotnet-aspnet-codegenerator
+dotnet tool uninstall --global dotnet-ef
+dotnet tool install --global dotnet-ef
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.EntityFrameworkCore.SQLite
+dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+```
+
+### 6. Use Scaffolding tools to produce CRUD pages
+```
+dotnet aspnet-codegenerator controller -name MoviesController -m Movie -dc MvcMovie.Data.MvcMovieContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries --databaseProvider sqlite
+```
+The comnmand above has:
+```
+    Using database provider'MicrosoftEntityFrameworkCoreSqlite'!
+
+    Added Controller : '\Controllers\MoviesController.cs'.
+    Added View : \Views\Movies\Create.cshtml
+    Added View : \Views\Movies\Edit.cshtml
+    Added View : \Views\Movies\Details.cshtml
+    Added View : \Views\Movies\Delete.cshtml
+    Added View : \Views\Movies\Index.cshtml
+```
+> **_NOTE:_** This app is not runable yet, As the database context does not exist.  
+```
+    SqliteException: SQLite Error 1: 'no such table: Movie'.
+```
+
+### 7. Initial Migtration
+Before migration, check ```Program.cs``` has updated to Config Correct db context 
+```
+    -->Example
+builder.Services.AddDbContext<MvcMovieContext>(options=>options.UseSqlite(builder.Configuration.GetConnectionStrin("MvcMovieContext")));
+```
+
+Use EF Core Migration feature to create the db, and update.
+```
+dotnet ef migrations add InitialCreate
+
+dotnet ef database update
+```
+Generated database context class and registration
+```
+    -> Data/MvcMovieContext.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MvcMovie.Models;
+
+namespace MvcMovie.Data
+{
+    public class MvcMovieContext : DbContext
+    {
+        public MvcMovieContext (DbContextOptions<MvcMovieContext> options)
+            : base(options)
+        {
+        }
+
+        public DbSet<MvcMovie.Models.Movie> Movie { get; set; } = default!;
+    }
+}
+```
+
+```
+    -> Migrations/{timestamp}_InitialCreate.cs
+protected override void Up(MigrationBuilder migrationBuilder){
+}
+protected override void Down(MigrationBuilder migrationBuilder){
+}
+```
+- InitialCreate.Up creates the Movie table and configures Id as the primary key
+- InitialCreate.Down reverts the schema changes made by the Up migration
+
+```
+    -> Controllers/MovieController.cs --> Constructor
+public class MoviesController : Controller
+{
+    private readonly MvcMovieContext _context;
+
+    public MoviesController(MvcMovieContext context)
+    {
+        _context = context;
+    }
+    ...
+}
+```
+> **_NOTE:_** Highly recommand the vscode extension: vscode-sqlite for db content reviewing
+
+Or type the command shown below
+```
+sudo apt install sqlite
+```
+
+### 8. Strongly Typed models and the ```@model``` directive
+
+```
+    -> Views/Movies/Details.cshtml
+```
+- The @model statement at the top specifies the type of object that the view expects
+
+```
+    -> Controllers/MoviesController.cs/Index
+    return View(await _context.Movie.ToListAsync());
+```
+- the code creates a List object when it calls the View method. The code passes this Movies list from the Index action method to the view
+
+```
+    -> Views/Movies/Index.cshtml
+@model IEnumerable<MvcMovie.Models.Movie>
+```
+-  @model directive allows access to the list of movies that the controller passed to the view by using a Model object that's strongly typed
+
+[tutorial p5 work with a database in an ASP.NET Core MVC app](https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-mvc-app/working-with-sql?view=aspnetcore-8.0&tabs=visual-studio)
