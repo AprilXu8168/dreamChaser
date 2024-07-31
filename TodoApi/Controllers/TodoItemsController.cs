@@ -52,8 +52,19 @@ namespace TodoApi.Controllers
             {
                 return BadRequest();
             }
+            // var todoItem = new TodoItem{
+            //     IsCompleted = todoItemDTO.IsComplete,
+            //     Name = todoItemDTO.Name
+            // };
 
-            _context.Entry(todoItemDTO).State = EntityState.Modified;
+            // _context.todoItems.Add(todoItem);
+            // await _context.SaveChangesAsync();
+
+            // return CreatedAtAction(nameof(GetTodoItem), 
+            // new { id = todoItem.ID }, 
+            // ItemToDTO(todoItem));
+
+            // _context.Entry(todoItemDTO).State = EntityState.Modified;
 
             var todoItem = await _context.todoItems.FindAsync(id);
 
@@ -64,20 +75,20 @@ namespace TodoApi.Controllers
             todoItem.Name = todoItemDTO.Name;
             todoItem.IsCompleted = todoItemDTO.IsComplete;
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
-                {
-                    return NotFound();
-                }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
+            {
+                return NotFound();
+            }
             return NoContent();
         }
 
         // POST: api/TodoItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("{id}")]
+        [HttpPost]
         public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO  todoItemDTO)
         {
             var todoItem = new TodoItem{

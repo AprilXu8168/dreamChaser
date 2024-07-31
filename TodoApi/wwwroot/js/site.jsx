@@ -10,7 +10,6 @@ function getItems() {
 
 function addItem() {
   const addNameTextbox = document.getElementById('add-name');
-
   const item = {
     isComplete: false,
     name: addNameTextbox.value.trim()
@@ -24,12 +23,21 @@ function addItem() {
     },
     body: JSON.stringify(item)
   })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok.');
+      }
+      return response.json();
+    })
     .then(() => {
-      getItems();
+      getItems(); // Make sure this function is defined elsewhere
       addNameTextbox.value = '';
     })
     .catch(error => console.error('Unable to add item.', error));
+
+  closeInput(); // Ensure this function is defined elsewhere
+
+    return false
 }
 
 function deleteItem(id) {
