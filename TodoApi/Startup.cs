@@ -1,3 +1,4 @@
+namespace TodoApi;
 using Microsoft.Extensions.Configuration;
 
 public class Startup
