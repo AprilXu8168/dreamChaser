@@ -46,7 +46,7 @@ namespace TodoApi.Controllers
         // PUT: api/TodoItems/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(int id, TodoItemDTO todoItemDTO)
+        public async Task<ActionResult<TodoItemDTO>> PutTodoItem(int id, TodoItemDTO todoItemDTO)
         {
             if (id != todoItemDTO.ID)
             {
@@ -77,7 +77,7 @@ namespace TodoApi.Controllers
 
         // POST: api/TodoItems
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost("{id}")]
         public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO  todoItemDTO)
         {
             var todoItem = new TodoItem{
