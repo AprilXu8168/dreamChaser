@@ -14,6 +14,7 @@ function addItem() {
     isComplete: false,
     name: addNameTextbox.value.trim()
   };
+  console.log("Backend, json received", JSON.stringify(item))
 
   fetch(uri, {
     method: 'POST',

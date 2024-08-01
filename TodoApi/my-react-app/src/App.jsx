@@ -25,22 +25,33 @@ class App extends Component{
   }
 
   async addClick(){
-    var newTask=document.getElementById("newTask").value;
+    var newTask=document.getElementById("newTask");
+    if (newTask.value == '') {
+      throw new Error('Task not valid! ');
+    }
     const data = new FormData();
     data.append("newTasks", newTask);
     const item = {
       isComplete: false,
-      name: newTask
+      name: newTask.value.trim()
     };
 
-    fetch (this.API_URL+"/api/todoItems",{
+    console.log("json received is", JSON.stringify(item))
+
+    fetch (this.API_URL+"api/todoitems/",{
       method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(item)
-    }).then(res => res.json())
-    .then((result) => {
-      alert(result);
+    })
+    .then(res => res.json())
+    .then(() => {
+      newTask.value='';
       this.refreshTasks();
     })
+
   }
 
   render() {
@@ -50,7 +61,7 @@ class App extends Component{
       <div className='App'>
         <h2>Todo App</h2>
         <input id="newTask" />
-        <button onClick={()=>this.addClick()}Add to List></button>
+        <button onClick={()=>this.addClick()}>Add to List</button>
         {tasks.map(item=>
           <p>
           <b>{item.name}</b>

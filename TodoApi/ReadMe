@@ -15,7 +15,7 @@
 | DELETE /api/todoitems/{id}  | Delete an item                 | None           | None  
 
 
-0. generate code
+### 0. generate code
 ```
     dotnet new webapi --use-controllers -o TodoApi
     cd TodoApi
@@ -23,9 +23,9 @@
     code -r ../TodoApi
 ```
 
-1. start from model folder, define data that app manages
+### 1. start from model folder, define data that app manages
 
-2. add a database context,  as the main class that coordinates EF functionality  for a data model
+### 2. add a database context,  as the main class that coordinates EF functionality  for a data model
 ```
     using Microsoft.EntityFrameworkCore;
 
@@ -43,7 +43,7 @@
     // TodoItem is the basic data type defined in model earlier
 ```
 
-3. Register db context
+### 3. Register db context
 ```
  => Program.cs
 
@@ -56,7 +56,7 @@
         opt.UseInMemoryDatabase("TodoList"));
 ```
 
-4. Scaffold a controller
+### 4. Scaffold a controller
 ```
     => TodoApi Root of project
 
@@ -69,13 +69,13 @@
     dotnet tool update -g dotnet-aspnet-codegenerator
 ```
 
-5. Generate Controller based on models and dbcontext
+### 5. Generate Controller based on models and dbcontext
 ```
     dotnet aspnet-codegenerator controller -name TodoItemsController -async -api -m TodoItem -dc TodoContext -outDir Controllers
 
 ```
 
-6. Review code to check routing 
+### 6. Review code to check routing 
 
 ```
     dotnet run dev
@@ -87,10 +87,124 @@ NOTE: Make sure to check port number before click
 
 [single data review](http://localhost:5295/api/TodoItems/2)
 
-7. Interaction with JS page
+### 7. Interaction with JS page
 ```
     => wwwroot -> index.html
     => wwwroot -> js -> site.js
     => wwwroot -> css -> site.css
 ```
 [Index page review](http://localhost:5295)
+
+### 8. Interaction with React component
+
+    To make sure the backend build and run ok, test with
+    http://localhost:5295/swagger/index.html
+    add/update/delete/get, etc.
+
+#### 8.0 Enable Cors from Backend
+```
+    -> Program.cs
+    //Enable cores 
+    app.UseCors(c => c.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+```
+
+#### 8.1 Create react app with npx 
+
+```
+    npx create-react-app my-app
+```
+
+#### 8.2 Define frontEnd as a react Component
+```
+    -> FrontEndapp/src/App.jsx 
+    import { React, Component } from 'react';
+```
+
+#### 8.3 Fetch/ Get
+
+``` 
+==> Props define
+
+    constructor(props){
+    super(props);
+    this.state={
+      tasks:[]
+    }
+  }
+
+==> Request define
+
+  // Global var all upper letters
+  API_URL = "http://localhost:5295/";
+
+  async refreshTasks(){
+    fetch(this.API_URL+"api/todoItems/").then(response => response.json())
+    .then(data => {
+      this.setState({tasks:data});
+    })
+  }
+
+
+==> when Refresh/Fetch
+    componentDidMount(){
+    this.refreshTasks();
+  }
+
+--> render() ==> parse datda
+    const{tasks} = this.state;
+
+==> Display with map func
+    {tasks.map(item=>
+        <p>
+        <b>{item.name}</b>
+        </p>
+    )}
+```
+
+#### 8.4 Post/Create
+```
+==> add button and input place holder
+    <input id="newTask" />
+    <button onClick={()=>this.addClick()}>Add to List</button>
+
+==> Take the input and create a json request body
+    var newTask=document.getElementById("newTask");
+
+    const item = {
+      isComplete: false,
+      name: newTask.value.trim()
+    };
+
+==> HTTP request 
+  async addClick(){
+    var newTask=document.getElementById("newTask");
+    if (newTask.value == '') {
+      throw new Error('Task not valid! ');
+    }
+    const data = new FormData();
+    data.append("newTasks", newTask);
+    const item = {
+      isComplete: false,
+      name: newTask.value.trim()
+    };
+
+    console.log("json received is", JSON.stringify(item))
+
+    fetch (this.API_URL+"api/todoitems/",{
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(item)
+    })
+    .then(res => res.json())
+    .then(() => {
+      newTask.value='';
+      this.refreshTasks();
+    })
+
+  }
+
+
+```
