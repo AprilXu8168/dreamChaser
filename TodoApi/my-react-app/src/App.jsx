@@ -26,7 +26,7 @@ class App extends Component{
 
   async addClick(){
     var newTask=document.getElementById("newTask");
-    if (newTask.value == '') {
+    if (newTask.value === '') {
       throw new Error('Task not valid! ');
     }
     const data = new FormData();
