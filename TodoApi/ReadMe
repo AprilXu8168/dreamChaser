@@ -206,5 +206,56 @@ NOTE: Make sure to check port number before click
 
   }
 
+```
 
+### Run postgres image inside docker container 
+
+1. Install docker 
+
+2. Install/Update dotnet-ef
+```
+dotnet tool install --local dotnet-ef --version 8.*
+```
+3. Add required packages
+```
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+```
+4. DB Content define
+```
+e.g.
+using Microsoft.EntityFrameworkCore;
+
+namespace proj_Name.Models;
+
+public class projContext : DbContext 
+{
+    public projContext(DbContextOptions<projContext> options)
+        : base(options)
+    {
+    }
+    public DbSet<TodoItem> todoItems { get; set; }
+}
+```
+5. Inject DB Contxt to Program.cs
+```
+  // Get connection string
+    var conn = builder.Configuration.GetConnectionString("connection_Name");
+    builder.Services.AddDbContext<db_NameContext>(options =>
+    options.UseNpgsql(conn));
+```
+6. Define connection string inside appsetting.json
+```
+"ConnectionStrings": {
+  "PostgresUser=postgres;
+  PostgresPassword=postgres;
+  ..."
+  }
+```
+
+7. [docker-compose.yml](https://medium.com/@jewelski/quickly-set-up-a-local-postgres-database-using-docker-5098052a4726)
+```
+docker-compose up -d
+The -d flag stands for "detached mode," 
+which means that the containers will be started in the background and will not be attached to the current terminal.
 ```
