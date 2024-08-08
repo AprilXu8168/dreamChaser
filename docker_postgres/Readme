@@ -1,0 +1,3 @@
+- Register server with pgadmin 
+Set the host to:
+``` host.docker.internal ```

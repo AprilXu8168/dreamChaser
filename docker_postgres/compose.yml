@@ -12,18 +12,31 @@ services:
       - db:/var/lib/postgresql/data
 
     networks:
-      - bridge
+      - host
 
-  adminer:
-    image: adminer
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - host
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
     restart: always
     ports:
-      - 8080:8080
-    networks:
-     - bridge
+      - "8888:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=postgres@dogtainers.com.au
+      - PGADMIN_DEFAULT_PASSWOR=postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
 volumes:
   db:
-    driver: host
+  pgadmin-data:
 
 networks:
-  bridge:
+  host:
