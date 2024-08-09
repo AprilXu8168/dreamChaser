@@ -259,3 +259,10 @@ docker-compose up -d
 The -d flag stands for "detached mode," 
 which means that the containers will be started in the background and will not be attached to the current terminal.
 ```
+
+8. GraphQL
+
+- GraphQL Queries - The **“gets”** that we want to read from the server.
+- GraphQL Mutations - This is how to write data on the server. It is the GraphQL convention on **how to write data into the system**.
+- typeDefs - The definition of our schema of what we can expect from queries and mutations.
+- Resolvers - Instead of the expectation of fields or required parameters, here we define the functions and behaviors of how should the queries and mutations would work.
